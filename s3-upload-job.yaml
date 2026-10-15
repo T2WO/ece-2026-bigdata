@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: s3-lab-upload
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: s3-upload
+          image: amazon/aws-cli:latest
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              aws --endpoint-url "$S3_ENDPOINT_URL" s3 cp /data/users.csv "s3://$LAB_BUCKET_NAME/bronze/users.csv"
+              aws --endpoint-url "$S3_ENDPOINT_URL" s3 cp /data/orders.csv "s3://$LAB_BUCKET_NAME/bronze/orders.csv"
+          envFrom:
+            - configMapRef:
+                name: s3-lab-config
+            - secretRef:
+                name: s3-lab-credentials
+          volumeMounts:
+            - name: datasets
+              mountPath: /data
+      volumes:
+        - name: datasets
+          configMap:
+            name: s3-lab-datasets
