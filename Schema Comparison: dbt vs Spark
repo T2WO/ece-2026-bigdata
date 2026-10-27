@@ -1,0 +1,9 @@
+Both dbt and Spark produced the same number of orders (2,829) and the same total quantity (8,615). However, their schemas are slightly different.
+
+UUID: dbt uses the UUID type, while Spark stores these identifiers as STRING because it does not support a native UUID type.
+
+Timestamp: dbt uses TIMESTAMP WITH TIME ZONE, while Spark uses TIMESTAMP.
+
+Other columns: quantity and product have the same data types in both systems.
+
+These differences can affect data compatibility. Users may need to convert data types or rename columns when working with both outputs.
